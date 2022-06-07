@@ -1,4 +1,11 @@
-version: '3.9'
+version: "3.9"
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+    driver: bridge
 
 services:
 
@@ -11,9 +18,35 @@ services:
       - ./src:/var/www/
 
   caddy:
-    restart: always
+    restart: unless-stopped
     build:
       context: ./
       dockerfile: ./dockers/caddy
+    environment:
+      - ACME_AGREE=true
+    ports:
+      - "80:80"
+      - "443:443"
+      - "2019:2019"
+    networks:
+      - web
+      - internal
     volumes:
       - ./src:/var/www/
+      # - ./dockers/etc:/etc/caddy
+
+  # openresty:
+  #   build:
+  #     context: ./
+  #     dockerfile: ./dockers/openresty
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #     - "2019:2019"
+  #   networks:
+  #     - web
+  #     - internal
+  #   volumes:
+  #     - ./src:/var/www
+
+
