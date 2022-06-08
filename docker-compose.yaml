@@ -10,12 +10,14 @@ networks:
 services:
 
   php:
-    restart: always
     build:
       context: ./
       dockerfile: ./dockers/php-fpm-7
     volumes:
       - ./src:/var/www/
+    networks:
+      - web
+      - internal
 
   caddy:
     restart: unless-stopped
@@ -32,8 +34,8 @@ services:
       - web
       - internal
     volumes:
-      - ./src:/var/www/
-      # - ./dockers/etc:/etc/caddy
+      - ./src:/var/www
+      - ./dockers/etc:/etc/caddy
 
   # openresty:
   #   build:
