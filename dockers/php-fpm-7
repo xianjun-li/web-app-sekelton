@@ -1,3 +1,88 @@
 # php:7-fpm-alpine
 # fixed version
 FROM php:7.4.29-fpm-alpine3.15
+
+ENV ALPINE_VERSION 3.15
+
+# 1. Base Setting
+# packages:
+# source.list
+RUN echo "https://mirrors.aliyun.com/alpine/v${ALPINE_VERSION}/main/" > /etc/apk/repositories \
+    && echo "http://mirrors.aliyun.com/alpine/v${ALPINE_VERSION}/community/" >> /etc/apk/repositories
+# common apks
+ENV PHPIZE_DEPS \
+    autoconf \
+    dpkg-dev dpkg \
+    file \
+    g++ \
+    gcc \
+    libc-dev \
+    make \
+    pkgconf \
+    re2c
+ENV APKS libcurl libzip-dev
+RUN	apk update \
+    && apk upgrade \
+    && apk add --update openssl \
+    && apk add --no-cache ${PHPIZE_DEPS} ${APKS}
+
+# 2. php-ext-install extensions
+ENV PHP_EXT pdo_mysql mysqli zip
+RUN docker-php-source extract \
+    && docker-php-ext-install ${PHP_EXT} \
+    && docker-php-ext-enable ${PHP_EXT} \
+    && docker-php-source delete
+
+# 3. pecl extensions
+# RUN pecl update-channels
+# RUN pecl install redis && docker-php-ext-enable redis \
+#     && pecl install swoole \ && docker-php-ext-enable swoole
+## dev
+# RUN pecl install xdebug && docker-php-ext-enable xdebug
+
+# ### other extensions
+# # gd
+# ENV PHP_GD_DEPS freetype \
+#     libpng \
+#     libjpeg-turbo \
+#     freetype-dev \
+#     libpng-dev \
+#     jpeg-dev \
+#     libjpeg \
+#     libjpeg-turbo-dev \
+#     libwebp-dev
+# RUN apk add --update $PHP_GD_DEPS && docker-php-ext-configure gd \
+# 	--with-freetype-dir=/usr/include/ \
+# 	--with-jpeg-dir=/usr/include/ \
+# 	--with-webp-dir=/usr/include/ \
+# 	&& docker-php-ext-install gd
+
+# # ffmpeg
+# # ffmpeg依赖
+# RUN apk add --no-cache yasm
+# RUN apk add ffmpeg
+
+# # ioncube
+# ENV IONCUBE_VERSION 7.2
+# ENV IONCUBE_URL http://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz
+
+# RUN mkdir -p /usr/local/ioncube \
+# 	&& curl -o /tmp/ioncube.tar.gz $IONCUBE_URL \
+# 	&& tar -xzvf /tmp/ioncube.tar.gz -C /tmp/ \
+# 	&& cp /tmp/ioncube/ioncube_loader_lin_$IONCUBE_VERSION.so /usr/local/ioncube/ \
+# 	&& rm -rf /tmp/ioncube \
+# 	&& rm /tmp/ioncube.tar.gz
+# RUN docker-php-ext-enable /usr/local/ioncube/ioncube_loader_lin_$IONCUBE_VERSION.so
+
+# # 4. tools
+# # composer
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+	&& php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+	&& php -r "unlink('composer-setup.php');"
+
+# # ssh2
+# RUN apk add openssh
+# RUN echo "\n" | pecl install -f ssh2-1.1.2
+
+# # 5. clear
+RUN rm -rf /tmp/pear

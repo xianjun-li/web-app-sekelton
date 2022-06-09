@@ -16,7 +16,6 @@ services:
     volumes:
       - ./src:/var/www/
     networks:
-      - web
       - internal
 
   caddy:
