@@ -2,6 +2,8 @@
 # fixed version
 FROM php:7.4.29-fpm-alpine3.15
 
+LABEL maintainer="purelib-php-fpm-base <lewis_dev@163.com>" version="1.0" license="MIT" app.name="purelib-php"
+
 ENV ALPINE_VERSION 3.15
 
 # 1. Base Setting
@@ -9,6 +11,7 @@ ENV ALPINE_VERSION 3.15
 # source.list
 RUN echo "https://mirrors.aliyun.com/alpine/v${ALPINE_VERSION}/main/" > /etc/apk/repositories \
     && echo "http://mirrors.aliyun.com/alpine/v${ALPINE_VERSION}/community/" >> /etc/apk/repositories
+
 # common apks
 ENV PHPIZE_DEPS \
     autoconf \
@@ -24,19 +27,33 @@ ENV APKS libcurl libzip-dev
 RUN	apk update \
     && apk upgrade \
     && apk add --update openssl \
+    ## linux tools: whereis etc.
+    # && apk add --update util-linux \
     && apk add --no-cache ${PHPIZE_DEPS} ${APKS}
 
 # 2. php-ext-install extensions
 ENV PHP_EXT pdo_mysql mysqli zip
 RUN docker-php-source extract \
     && docker-php-ext-install ${PHP_EXT} \
-    && docker-php-ext-enable ${PHP_EXT} \
-    && docker-php-source delete
+    && docker-php-ext-enable ${PHP_EXT}
+# && docker-php-source delete
 
 # 3. pecl extensions
-# RUN pecl update-channels
-# RUN pecl install redis && docker-php-ext-enable redis \
-#     && pecl install swoole \ && docker-php-ext-enable swoole
+COPY docker-php-ext-get /usr/local/bin/
+
+ENV SWOOLE_VERSION 4.4.26
+ENV REDIS_VERSION 5.3.7
+RUN pecl update-channels \
+    && docker-php-ext-get swoole ${SWOOLE_VERSION}
+RUN pecl update-channels \    
+    && docker-php-ext-get redis ${REDIS_VERSION}
+RUN docker-php-ext-install swoole \
+    && docker-php-ext-enable swoole
+RUN docker-php-ext-install redis \
+    && docker-php-ext-enable redis
+# RUN docker-php-ext-get redis 5.3.7 && docker-php-ext-install redis && docker-php-ext-enable redis
+# RUN pecl install redis && docker-php-ext-enable redis && pecl install swoole-${SWOOLE_VERSION} && docker-php-ext-enable swoole 
+
 ## dev
 # RUN pecl install xdebug && docker-php-ext-enable xdebug
 
@@ -63,7 +80,7 @@ RUN docker-php-source extract \
 # RUN apk add ffmpeg
 
 # # ioncube
-# ENV IONCUBE_VERSION 7.2
+# ENV IONCUBE_VERSION 7.4
 # ENV IONCUBE_URL http://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz
 
 # RUN mkdir -p /usr/local/ioncube \
@@ -76,13 +93,14 @@ RUN docker-php-source extract \
 
 # # 4. tools
 # # composer
-RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
-	&& php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
-	&& php -r "unlink('composer-setup.php');"
+# RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+#     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
+#     && composer config -g repo.packagist composer "https://mirrors.aliyun.com/composer" \
+#     && rm composer-setup.php
 
 # # ssh2
 # RUN apk add openssh
 # RUN echo "\n" | pecl install -f ssh2-1.1.2
 
 # # 5. clear
-RUN rm -rf /tmp/pear
+# RUN rm -rf /tmp/pear 

@@ -11,8 +11,8 @@ services:
 
   php:
     build:
-      context: ./
-      dockerfile: ./dockers/php-fpm-7
+      context: ./dockers
+      dockerfile: php-fpm-7
     volumes:
       - ./src:/var/www/
     networks:
@@ -21,8 +21,8 @@ services:
   caddy:
     restart: unless-stopped
     build:
-      context: ./
-      dockerfile: ./dockers/caddy
+      context: ./dockers
+      dockerfile: ./caddy
     environment:
       - ACME_AGREE=true
     ports:
