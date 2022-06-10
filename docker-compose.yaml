@@ -9,6 +9,7 @@ networks:
 
 services:
   php:
+    restart: always
     build:
       context: ./dockers
       dockerfile: php-fpm-alpine
@@ -19,6 +20,11 @@ services:
       - ./src:/var/www/
     networks:
       - internal
+
+  mysql:
+    build:
+      context: ./dockers/mysql
+      dockerfile: Dockerfile
 
   caddy:
     restart: unless-stopped
