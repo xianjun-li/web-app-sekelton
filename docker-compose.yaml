@@ -8,11 +8,13 @@ networks:
     driver: bridge
 
 services:
-
   php:
     build:
       context: ./dockers
-      dockerfile: php-fpm-7
+      dockerfile: php-fpm-alpine
+      args:
+        PHP_VERSION: 7.4.29
+        ALPINE_VERSION: 3.15
     volumes:
       - ./src:/var/www/
     networks:
@@ -49,5 +51,3 @@ services:
   #     - internal
   #   volumes:
   #     - ./src:/var/www
-
-

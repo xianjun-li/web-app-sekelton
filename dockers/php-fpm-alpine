@@ -1,5 +1,3 @@
-# php:7-fpm-alpine
-# fixed version
 ARG ALPINE_VERSION=3.15
 ARG PHP_VERSION=7.4.29
 
@@ -9,6 +7,9 @@ LABEL maintainer="purelib-php-fpm-base <lewis_dev@163.com>" version="1.0" licens
 
 ARG ALPINE_VERSION=3.15
 ARG PHP_VERSION=7.4.29
+
+ENV ALPINE_VERSION ${ALPINE_VERSION}
+ENV PHP_VERSION ${PHP_VERSION}
 
 # 1. Base Setting
 # packages:
