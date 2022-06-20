@@ -25,6 +25,16 @@ services:
     build:
       context: ./dockers/mysql
       dockerfile: Dockerfile
+    ports:
+      - 3306:3306
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+        - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+        - MYSQL_USER=${MYSQL_USER}
+        - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+        - MYSQL_DATABASE=${MYSQL_DATABASE}
+    volumes:
+      - ${DATA_ROOT}/mysql:/var/lib/mysql
 
   caddy:
     restart: unless-stopped
