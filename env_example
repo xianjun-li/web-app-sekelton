@@ -1,0 +1,23 @@
+ETC_ROOT=/etc
+DATA_ROOT=/var
+SRC_ROOT=/var/www
+LOG_ROOT=/var/log
+
+TIMEZONE=Asia/Shanghai
+
+COMPOSE_PROJECT_NAME=
+
+MYSQL_ROOT_PASSWORD=password
+MYSQL_USER=user
+MYSQL_PASSWORD=password
+MYSQL_DATABASE=test
+
+REDIS_PASSWORD=password
+DOCKER_REQUIREPASS=password
+
+# HOST_IP=0.0.0.0
+
+# SSHD
+SSH_USERS=user:uid:gid
+SFTP_MODE=true
+SFTP_CHROOT=/var/ww
