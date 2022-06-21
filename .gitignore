@@ -1,3 +1,7 @@
 .bak
 .env
 .*~
+*.bak
+**/*.bak/**
+
+.DS_Store
